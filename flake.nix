@@ -5,15 +5,9 @@
     haskellNix.url = "github:input-output-hk/haskell.nix";
     nixpkgs.follows = "haskellNix/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
-
-    nixpak = {
-      url = "github:max-privatevoid/nixpak";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = inputs@{ nixpkgs, flake-parts, haskellNix, pre-commit-hooks, ... }:
+  outputs = inputs@{ nixpkgs, flake-parts, haskellNix, ... }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
       perSystem = { options, config, self', inputs', lib, system, ... }:
@@ -32,6 +26,9 @@
           flake = project.flake { };
         in
           { inherit (flake) packages devShells; } // {
+            # This is how more packages can be added.
+            # One can build a docker container, shell script, and
+            # other stuff like this.
             packages.sayHello =
               pkgs.writeShellScript "helloWorld" ''
               echo "hello world"
